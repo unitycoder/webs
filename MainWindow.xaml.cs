@@ -12,7 +12,7 @@ namespace webs
 {
     public partial class MainWindow : Window
     {
-        static string appname = "webs";
+        public static string appname = "webs";
         //static readonly string rootFolder = AppDomain.CurrentDomain.BaseDirectory;
         static string rootFolder = "";
 
@@ -53,53 +53,58 @@ namespace webs
 
                 var parameters = ArgParser.Parse(args, AppDomain.CurrentDomain.BaseDirectory);
 
-                // TODO check local config file
-
                 if (parameters.errors.Count == 0)
                 {
-                    StartServer(parameters);
+                    // handle install and other commands
+                    if (parameters.installContextMenu == true) Tools.InstallContextMenu();
+                    if (parameters.uninstallContextMenu == true) Tools.UninstallContextMenu();
+                    if (parameters.addPath == true) Tools.ModifyUserEnvPATH(add: true);
+                    if (parameters.removePath == true) Tools.ModifyUserEnvPATH(add: false);
 
-                    // wait for exit
-                    Console.ReadLine();
-
-                    // NOTE need to wait readline inside VS manually (for easier testing), only if inside VS
-                    if (Debugger.IsAttached)
+                    // do we have folder
+                    if (string.IsNullOrEmpty(parameters.rootFolder) == false)
                     {
-                        // Start a new instance of cmd.exe (the Windows command prompt)
-                        Process cmdProcess = new Process();
-                        cmdProcess.StartInfo.FileName = "cmd.exe";
-                        cmdProcess.StartInfo.RedirectStandardInput = true;
-                        cmdProcess.StartInfo.RedirectStandardOutput = true;
-                        cmdProcess.StartInfo.UseShellExecute = false;
-                        cmdProcess.StartInfo.CreateNoWindow = false;
+                        StartServer(parameters);
 
-                        // Start the process
-                        cmdProcess.Start();
+                        // wait for exit
+                        Console.ReadLine();
 
-                        // Get the StandardInput stream and StandardOutput stream
-                        StreamWriter cmdStreamWriter = cmdProcess.StandardInput;
-                        StreamReader cmdStreamReader = cmdProcess.StandardOutput;
+                        // NOTE need to wait readline inside VS manually (for easier testing), only if inside VS
+                        if (Debugger.IsAttached)
+                        {
+                            // Start a new instance of cmd.exe (the Windows command prompt)
+                            Process cmdProcess = new Process();
+                            cmdProcess.StartInfo.FileName = "cmd.exe";
+                            cmdProcess.StartInfo.RedirectStandardInput = true;
+                            cmdProcess.StartInfo.RedirectStandardOutput = true;
+                            cmdProcess.StartInfo.UseShellExecute = false;
+                            cmdProcess.StartInfo.CreateNoWindow = false;
 
-                        // You can send commands to the console like this:
-                        cmdStreamWriter.WriteLine("echo Hello from the script!");
+                            // Start the process
+                            cmdProcess.Start();
 
-                        // Wait for user input in the console
-                        Console.WriteLine("Press Enter to continue...");
-                        cmdStreamReader.ReadLine(); // Wait for user input
+                            // Get the StandardInput stream and StandardOutput stream
+                            StreamWriter cmdStreamWriter = cmdProcess.StandardInput;
+                            StreamReader cmdStreamReader = cmdProcess.StandardOutput;
 
-                        cmdProcess.WaitForExit(); // Wait for the process to exit
-                        cmdStreamWriter.Close(); // Close the input stream to indicate that we're done writing
+                            // You can send commands to the console like this:
+                            cmdStreamWriter.WriteLine("TestWriteLine");
+
+                            // Wait for user input in the console
+                            Console.WriteLine("Press Enter to continue...");
+                            cmdStreamReader.ReadLine(); // Wait for user input
+
+                            cmdProcess.WaitForExit(); // Wait for the process to exit
+                            cmdStreamWriter.Close(); // Close the input stream to indicate that we're done writing
+                        }
                     }
                 }
 
-                // end output
-                Console.WriteLine("Exited.");
                 Console.ForegroundColor = ConsoleColor.White;
-
+                Console.WriteLine("Exited.");
                 FreeConsole();
                 Environment.Exit(0);
             }
-
 
             // regular WPF gui starts here
             this.Title = appname;

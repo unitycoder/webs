@@ -10,8 +10,8 @@ namespace webs
         internal bool ignoreConfig = false;
         internal bool installContextMenu = false;
         internal bool addPath = false;
-        internal bool uninstall = false;
-        internal bool removepath = false;
+        internal bool uninstallContextMenu = false;
+        internal bool removePath = false;
         internal bool noBrowser = false;
         internal bool https = false;
         internal int HTTP_port = 8080;

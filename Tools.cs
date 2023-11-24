@@ -27,51 +27,6 @@ namespace webs
             }
         }
 
-        public static void PrintHelpAndExit(bool waitEnter = false)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("");
-            Console.WriteLine("--- Optional Parameters (in this order) ------------------------------------------");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("folder_to_host\tExample: c\\websites\\test1");
-            Console.WriteLine("http_port\tDefault is 8080");
-            Console.WriteLine("https_port\tDefault is 4443. Only used if running as Admin");
-            Console.WriteLine("admin\tMust be used, if want to host using IP address and have outside connections");
-            Console.WriteLine("nobrowser\tDon't open browser automatically");
-            Console.WriteLine("ignoreconfig\tWon't read local config.ini");
-            Console.WriteLine("https\tEnable https connection (requires running as an Admin)");
-            Console.WriteLine("");
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("--- Setup Parameters (in any order) ----------------------------------------------");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("install\tInstalls Explorer context menu to start hosting is folder");
-            Console.WriteLine("uninstall\tRemoves Explorer context menu to start hosting is folder");
-            Console.WriteLine("addpath\tAdds webs.exe folder into user PATH environment variable");
-            Console.WriteLine("removepath\tRemoves webs.exe folder from user PATH environment variable");
-            Console.WriteLine("");
-            Console.WriteLine("? /? -?\tDisplay this help");
-            Console.ForegroundColor = ConsoleColor.White;
-            if (waitEnter == true) Console.ReadLine();
-            Environment.Exit(0);
-        }
-
-        public static void PrintBanner()
-        {
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.WriteLine("\n ::::: simple local webserver :::::");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            string asciiArt = @" ██╗    ██╗███████╗██████╗ ███████╗
- ██║    ██║██╔════╝██╔══██╗██╔════╝
- ██║ █╗ ██║█████╗  ██████╔╝███████╗
- ██║███╗██║██╔══╝  ██╔══██╗╚════██║
- ╚███╔███╔╝███████╗██████╔╝███████║
-  ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝";
-            Console.WriteLine(asciiArt);
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.WriteLine(" https://github.com/unitycoder/webs");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
         static bool IsAlreadyAddedToPath()
         {
             string executablePath = GetExePath();
@@ -169,7 +124,7 @@ namespace webs
 
             if (key != null)
             {
-                var appName = "SimpleWebBrowser";
+                var appName = MainWindow.appname;
                 key.CreateSubKey(appName);
 
                 key = key.OpenSubKey(appName, true);
@@ -196,7 +151,7 @@ namespace webs
             RegistryKey key = Registry.CurrentUser.OpenSubKey(contextRegRoot, true);
             if (key != null)
             {
-                var appName = "SimpleWebBrowser";
+                var appName = "webs";
                 RegistryKey appKey = Registry.CurrentUser.OpenSubKey(contextRegRoot + "\\" + appName, false);
                 if (appKey != null)
                 {
@@ -212,7 +167,7 @@ namespace webs
             RegistryKey key = Registry.CurrentUser.OpenSubKey(contextRegRoot, true);
             if (key != null)
             {
-                var appName = "SimpleWebBrowser";
+                var appName = MainWindow.appname;
                 RegistryKey appKey = Registry.CurrentUser.OpenSubKey(contextRegRoot + "\\" + appName, false);
                 if (appKey != null)
                 {
@@ -290,6 +245,51 @@ namespace webs
         private static string GetExePath()
         {
             return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+        }
+
+        public static void PrintHelpAndExit(bool waitEnter = false)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("");
+            Console.WriteLine("--- Optional Parameters (in this order) ------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("folder_to_host\tExample: c\\websites\\test1");
+            Console.WriteLine("http_port\tDefault is 8080");
+            Console.WriteLine("https_port\tDefault is 4443. Only used if running as Admin");
+            Console.WriteLine("admin\tMust be used, if want to host using IP address and have outside connections");
+            Console.WriteLine("nobrowser\tDon't open browser automatically");
+            Console.WriteLine("ignoreconfig\tWon't read local config.ini");
+            Console.WriteLine("https\tEnable https connection (requires running as an Admin)");
+            Console.WriteLine("");
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("--- Setup Parameters (in any order) ----------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("install\tInstalls Explorer context menu to start hosting is folder");
+            Console.WriteLine("uninstall\tRemoves Explorer context menu to start hosting is folder");
+            Console.WriteLine("addpath\tAdds webs.exe folder into user PATH environment variable");
+            Console.WriteLine("removepath\tRemoves webs.exe folder from user PATH environment variable");
+            Console.WriteLine("");
+            Console.WriteLine("? /? -?\tDisplay this help");
+            Console.ForegroundColor = ConsoleColor.White;
+            if (waitEnter == true) Console.ReadLine();
+            Environment.Exit(0);
+        }
+
+        public static void PrintBanner()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.WriteLine("\n ::::: simple local webserver :::::");
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            string asciiArt = @" ██╗    ██╗███████╗██████╗ ███████╗
+ ██║    ██║██╔════╝██╔══██╗██╔════╝
+ ██║ █╗ ██║█████╗  ██████╔╝███████╗
+ ██║███╗██║██╔══╝  ██╔══██╗╚════██║
+ ╚███╔███╔╝███████╗██████╔╝███████║
+  ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝";
+            Console.WriteLine(asciiArt);
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.WriteLine(" https://github.com/unitycoder/webs");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
     } // class

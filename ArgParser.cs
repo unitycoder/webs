@@ -20,37 +20,37 @@ namespace webs
         [DllImport("kernel32.dll")]
         static extern IntPtr LocalFree(IntPtr hMem);
 
-        static string[] SplitArgs(string unsplitArgumentLine)
-        {
-            int numberOfArgs;
-            IntPtr ptrToSplitArgs;
-            string[] splitArgs;
+        //static string[] SplitArgs(string unsplitArgumentLine)
+        //{
+        //    int numberOfArgs;
+        //    IntPtr ptrToSplitArgs;
+        //    string[] splitArgs;
 
-            ptrToSplitArgs = CommandLineToArgvW(unsplitArgumentLine, out numberOfArgs);
+        //    ptrToSplitArgs = CommandLineToArgvW(unsplitArgumentLine, out numberOfArgs);
 
-            // CommandLineToArgvW returns NULL upon failure.
-            if (ptrToSplitArgs == IntPtr.Zero) throw new ArgumentException("Unable to split argument.", new Win32Exception());
+        //    // CommandLineToArgvW returns NULL upon failure.
+        //    if (ptrToSplitArgs == IntPtr.Zero) throw new ArgumentException("Unable to split argument.", new Win32Exception());
 
-            // Make sure the memory ptrToSplitArgs to is freed, even upon failure.
-            try
-            {
-                splitArgs = new string[numberOfArgs];
+        //    // Make sure the memory ptrToSplitArgs to is freed, even upon failure.
+        //    try
+        //    {
+        //        splitArgs = new string[numberOfArgs];
 
-                // ptrToSplitArgs is an array of pointers to null terminated Unicode strings.
-                // Copy each of these strings into our split argument array.
-                for (int i = 0; i < numberOfArgs; i++)
-                {
-                    splitArgs[i] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(ptrToSplitArgs, i * IntPtr.Size));
-                }
+        //        // ptrToSplitArgs is an array of pointers to null terminated Unicode strings.
+        //        // Copy each of these strings into our split argument array.
+        //        for (int i = 0; i < numberOfArgs; i++)
+        //        {
+        //            splitArgs[i] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(ptrToSplitArgs, i * IntPtr.Size));
+        //        }
 
-                return splitArgs;
-            }
-            finally
-            {
-                // Free memory obtained by CommandLineToArgW.
-                LocalFree(ptrToSplitArgs);
-            }
-        }
+        //        return splitArgs;
+        //    }
+        //    finally
+        //    {
+        //        // Free memory obtained by CommandLineToArgW.
+        //        LocalFree(ptrToSplitArgs);
+        //    }
+        //}
 
         static string Reverse(string s)
         {
@@ -92,12 +92,13 @@ namespace webs
 
             // handle manual args (null is default args, not used)
             //if (args == null) args = SplitArgs(GetEscapedCommandLine()).Skip(1).ToArray();
+            // folder backslash quote fix https://stackoverflow.com/a/9288040/5452781
 
             // parse commandline arguments
             if (args != null && args.Length > 0)
             {
-                // folder backslash quote fix https://stackoverflow.com/a/9288040/5452781
-                for (int i = 0; i < args.Length; i++)
+                // NOTE start from 1 to skip the first arg, which is the exe path in commandline ( maybe not explorer context menu ? )
+                for (int i = 1; i < args.Length; i++)
                 {
                     Console.WriteLine(args[i]);
 
@@ -154,8 +155,8 @@ namespace webs
                     {
                         parameters.noBrowser = true;
                         continue;
-                    }            
-                    
+                    }
+
                     // enable https
                     if (args[i].ToLower() == "https")
                     {
@@ -172,7 +173,7 @@ namespace webs
 
                     if (args[i].ToLower() == "install")
                     {
-                        if (parameters.uninstall == true)
+                        if (parameters.uninstallContextMenu == true)
                         {
                             errors.Add("Cannot install and uninstall at the same time");
                         }
@@ -182,7 +183,7 @@ namespace webs
 
                     if (args[i].ToLower() == "addPath")
                     {
-                        if (parameters.removepath == true)
+                        if (parameters.removePath == true)
                         {
                             errors.Add("Cannot add and remove path at the same time");
                         }
@@ -196,7 +197,7 @@ namespace webs
                         {
                             errors.Add("Cannot install and uninstall at the same time");
                         }
-                        parameters.uninstall = true;
+                        parameters.uninstallContextMenu = true;
                         continue;
                     }
 
@@ -206,15 +207,24 @@ namespace webs
                         {
                             errors.Add("Cannot add and remove path at the same time");
                         }
-                        parameters.removepath = true;
+                        parameters.removePath = true;
                         continue;
                     }
+
+                    // invalid argument
+                    errors.Add("Invalid argument: " + args[i]);
 
                 } // for args
             }
             else // if no commandline args
             {
                 Tools.PrintHelpAndExit(waitEnter: true);
+            }
+
+            // TODO check if rootFolder is valid or doing something else
+            if (string.IsNullOrEmpty(parameters.rootFolder) == true && (parameters.installContextMenu == false && parameters.uninstallContextMenu == false && parameters.addPath == false && parameters.removePath == false))
+            {
+                errors.Add("No root folder specified");
             }
 
             // show errors
