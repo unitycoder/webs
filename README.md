@@ -1,4 +1,4 @@
-### webs
+### webs (WIP)
 simple local webserver (commandline & GUI)
 
 ### Features
